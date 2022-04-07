@@ -13,6 +13,9 @@ class Endpoint(models.Model):
     owner = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 class MLAlgorithm(models.Model):
     '''
     Represents an algorithm provided by the API for use in inference.
@@ -33,6 +36,13 @@ class MLAlgorithm(models.Model):
     owner = models.CharField(max_length=128)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
     parent_endpoint = models.ForeignKey(Endpoint, on_delete=models.CASCADE)
+
+    def __str__(self):
+        str = f"{self.name} (v{self.version}) -- "
+        if len(self.description) > 50:
+            return f"{str}{self.description[:50]}..."
+        else:
+            return str + self.description
 
     class Meta:
         verbose_name = "ML algorithm"
@@ -58,8 +68,11 @@ class MLAlgorithmStatus(models.Model):
                                             related_name = "status", 
                                             verbose_name="parent ML algorithm")
 
+    def __str__(self):
+        return f"{self.parent_mlalgorithm.name} (v{self.parent_mlalgorithm.version}).{self.status}"
+
     class Meta:
-        verbose_name = "ML algorithm"
+        verbose_name = "ML algorithm status"
         verbose_name_plural = "ML algorithm statuses"
         
 class MLRequest(models.Model):
