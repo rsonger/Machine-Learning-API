@@ -2,7 +2,7 @@ import inspect
 
 from django.test import TestCase
 
-from .income_classifier.random_forest import RandomForestClassifier
+from .income_classifier.income_classifier import IncomeClassifier
 from .registry import MLRegistry
 
 class MLTests(TestCase):
@@ -23,7 +23,7 @@ class MLTests(TestCase):
             "hours-per-week": 68,
             "native-country": "United-States"
         }
-        my_alg = RandomForestClassifier()
+        my_alg = IncomeClassifier("random_forest.joblib")
         response = my_alg.compute_prediction(test_data)
         self.assertEqual('OK', response['status'])
         self.assertTrue('label' in response)
@@ -33,13 +33,13 @@ class MLTests(TestCase):
         registry = MLRegistry()
         self.assertEqual(len(registry.endpoints), 0)
         endpoint_name = "income_classifier"
-        algorithm_object = RandomForestClassifier()
+        algorithm_object = IncomeClassifier("random_forest.joblib")
         algorithm_name = "random forest"
         algorithm_status = "production"
         algorithm_version = "0.0.1"
         algorithm_owner = "Piotr"
         algorithm_description = "Random Forest with simple pre- and post-processing"
-        algorithm_code = inspect.getsource(RandomForestClassifier)
+        algorithm_code = inspect.getsource(IncomeClassifier)
         # add to registry
         registry.add_algorithm(endpoint_name, algorithm_object, algorithm_name,
                     algorithm_status, algorithm_version, algorithm_owner,

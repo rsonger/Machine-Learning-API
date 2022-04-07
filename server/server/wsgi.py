@@ -20,19 +20,30 @@ application = get_wsgi_application()
 # ML registry
 import inspect
 from ml.registry import MLRegistry
-from ml.income_classifier.random_forest import RandomForestClassifier
+from ml.income_classifier.income_classifier import IncomeClassifier
 
 try:
     registry = MLRegistry()
-    rf = RandomForestClassifier()
+    rf = IncomeClassifier("random_forest.joblib")
+    et = IncomeClassifier("extra_trees.joblib")
 
-    registry.add_algorithm(endpoint_name="income_classifier",
+    registry.add_algorithm(endpoint_name="income_classifier_rf",
                            algorithm_object=rf,
                            algorithm_name="Random Forest",
                            algorithm_status="production",
                            algorithm_version="0.0.1",
                            owner="Rob",
-                           algorithm_description="Random Forest with simple pre- and post-processing.",
-                           algorithm_code=inspect.getsource(RandomForestClassifier))
+                           algorithm_description="Random Forest for classifying income as above or below 50K.",
+                           algorithm_code=inspect.getsource(IncomeClassifier))
+    
+    registry.add_algorithm(endpoint_name="income_classifier_et",
+                           algorithm_object=et,
+                           algorithm_name="Extra Trees",
+                           algorithm_status="production",
+                           algorithm_version="0.0.1",
+                           owner="Rob",
+                           algorithm_description="Extra Trees for classifying income as above or below 50K.",
+                           algorithm_code=inspect.getsource(IncomeClassifier))
+    
 except Exception as e:
     print(f"Exception while loading algorithms to the registry:\n>>\t{str(e)}")
