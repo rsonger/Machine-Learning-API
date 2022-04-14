@@ -31,7 +31,7 @@ class MLTests(TestCase):
 
     def test_registry(self):
         registry = MLRegistry()
-        self.assertEqual(len(registry.endpoints), 0)
+        self.assertEqual(len(str(registry)), 2)
         endpoint_name = "income_classifier"
         algorithm_object = IncomeClassifier("random_forest.joblib")
         algorithm_name = "random forest"
@@ -45,4 +45,4 @@ class MLTests(TestCase):
                     algorithm_status, algorithm_version, algorithm_owner,
                     algorithm_description, algorithm_code)
         # there should be one endpoint available
-        self.assertEqual(len(registry.endpoints), 1)
+        self.assertGreater(len(str(registry)), 2)
