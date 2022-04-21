@@ -23,7 +23,7 @@ class MLTests(TestCase):
             "hours-per-week": 68,
             "native-country": "United-States"
         }
-        my_alg = IncomeClassifier("random_forest.joblib")
+        my_alg = IncomeClassifier("Random Forest")
         response = my_alg.compute_prediction(test_data)
         self.assertEqual('OK', response['status'])
         self.assertTrue('label' in response)
@@ -31,13 +31,13 @@ class MLTests(TestCase):
 
     def test_registry(self):
         registry = MLRegistry()
-        self.assertEqual(len(str(registry)), 2)
+        start_num_algos = len(registry)
         endpoint_name = "income_classifier"
-        algorithm_object = IncomeClassifier("random_forest.joblib")
+        algorithm_object = IncomeClassifier("Random Forest")
         algorithm_name = "random forest"
         algorithm_status = "production"
         algorithm_version = "0.0.1"
-        algorithm_owner = "Piotr"
+        algorithm_owner = "Rob"
         algorithm_description = "Random Forest with simple pre- and post-processing"
         algorithm_code = inspect.getsource(IncomeClassifier)
         # add to registry
@@ -45,4 +45,4 @@ class MLTests(TestCase):
                     algorithm_status, algorithm_version, algorithm_owner,
                     algorithm_description, algorithm_code)
         # there should be one endpoint available
-        self.assertGreater(len(str(registry)), 2)
+        self.assertGreater(len(registry), start_num_algos)

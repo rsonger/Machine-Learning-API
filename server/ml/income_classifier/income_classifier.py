@@ -1,6 +1,6 @@
 import joblib
 import pandas as pd
-import numpy as np
+import json
 from pathlib import Path
 from rest_framework.exceptions import APIException
 
@@ -14,17 +14,28 @@ class IncomeClassifier:
         model: the trained income classifier model
     '''
     
-    def __init__(self, saved_model):
+    def __init__(self, model_name):
         """Loads artifacts from the training folder for a given model.
 
         Args:
-            saved_model (string): The name of a joblib file containing the model to load.
+            model_name (string): The name of a model with an associated joblib file.
         """
+        model_files = {
+            "random forest": "random_forest.joblib",
+            "extra trees": "extra_trees.joblib"
+        }
+
         project_dir = Path(__file__).resolve().parent.parent.parent.parent
         path_to_artifacts = Path(project_dir, "training")
-        self.values_fill_missing =  joblib.load(Path(path_to_artifacts, "train_mode.joblib"))
-        self.encoder = joblib.load(Path(path_to_artifacts, "encoder.joblib"))
-        self.model = joblib.load(Path(path_to_artifacts, saved_model))
+        self.values_fill_missing =  joblib.load(
+            Path(path_to_artifacts, "train_mode.joblib")
+        )
+        self.encoder = joblib.load(
+            Path(path_to_artifacts, "encoder.joblib")
+        )
+        self.model = joblib.load(
+            Path(path_to_artifacts, model_files[model_name.lower()])
+        )
 
     def preprocessing(self, input_data):
         '''
@@ -46,7 +57,7 @@ class IncomeClassifier:
         if input_data.shape[0] > 1:
             raise APIException("Multiple samples provided to single sample prediction method")
         # fill missing values
-        input_data.fillna(self.values_fill_missing)
+        input_data.fillna(self.values_fill_missing, inplace=True)
         # convert categoricals
         categoricals = self.encoder.feature_names_in_
         input_data_encoded = self.encoder.transform(input_data[categoricals])

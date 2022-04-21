@@ -23,29 +23,35 @@ from ml.income_classifier.income_classifier import IncomeClassifier
 
 # try:
 registry = MLRegistry()
-rf = IncomeClassifier("random_forest.joblib")
-et = IncomeClassifier("extra_trees.joblib")
 
 algos_to_add = (
     {
         "endpoint": "income_classifier",
         "name": "Random Forest",
-        "version": "0.0.1"
+        "version": "0.0.1",
+        "status": "production"
     },
-    # {
-    #     "endpoint": "income_classifier",
-    #     "name": "Extra Trees",
-    #     "version": "0.0.1"
-    # }
+    {
+        "endpoint": "income_classifier",
+        "name": "Random Forest",
+        "version": "0.0.2",
+        "status": "ab_testing"
+    },
+    {
+        "endpoint": "income_classifier",
+        "name": "Extra Trees",
+        "version": "0.0.2",
+        "status": "ab_testing"
+    }
 )
 
 for algo in algos_to_add:
-    print(f"Checking algorithm\n\t{algo}")
-    # if not registry.is_registered(algo["endpoint"], algo["name"], algo["version"]):
-    registry.add_algorithm(endpoint_name=algo["endpoint"],
-                        algorithm_object=rf,
+    if not registry.is_registered(algo["endpoint"], algo["name"], algo["version"], algo["status"]):
+        algorithm_object = IncomeClassifier(algo["name"])
+        registry.add_algorithm(endpoint_name=algo["endpoint"],
+                        algorithm_object=algorithm_object,
                         algorithm_name=algo["name"],
-                        algorithm_status="production",
+                        algorithm_status=algo["status"],
                         algorithm_version=algo["version"],
                         owner="Rob",
                         algorithm_description="Classifier model for predicting income as above or below 50K.",
@@ -53,5 +59,3 @@ for algo in algos_to_add:
     
 # except Exception as e:
     # print(f"Exception while loading algorithms to the registry:\n>>\t{type(e)} :: {e}")
-
-print(f"-> Finished initializing registry:\n>>\t{registry}")

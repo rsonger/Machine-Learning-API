@@ -11,6 +11,7 @@ from .models import Endpoint
 from .models import MLAlgorithm
 from .models import MLAlgorithmStatus
 from .models import MLRequest
+from .models import ABTest
 
 class EndpointSerializer(serializers.ModelSerializer):
 
@@ -25,7 +26,9 @@ class MLAlgorithmSerializer(serializers.ModelSerializer):
     current_status = serializers.SerializerMethodField(read_only=True)
 
     def get_current_status(self, mlalgorithm):
-        return MLAlgorithmStatus.objects.filter(parent_mlalgorithm=mlalgorithm).latest('created_at').status
+        return MLAlgorithmStatus.objects.filter(
+            parent_mlalgorithm=mlalgorithm
+        ).latest('created_at').status
 
     class Meta:
         model = MLAlgorithm
@@ -39,25 +42,21 @@ class MLAlgorithmStatusSerializer(serializers.ModelSerializer):
         model = MLAlgorithmStatus
         read_only_fields = ("id", "active")
         fields = ("id", "active", "status", "created_by", "created_at",
-                            "parent_mlalgorithm")
+                  "parent_mlalgorithm")
 
 class MLRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = MLRequest
-        read_only_fields = (
-            "id",
-            "input_data",
-            "full_response",
-            "response",
-            "created_at",
-            "parent_mlalgorithm",
-        )
-        fields =  (
-            "id",
-            "input_data",
-            "full_response",
-            "response",
-            "feedback",
-            "created_at",
-            "parent_mlalgorithm",
-        )
+        read_only_fields = ("id", "input_data", "full_response",
+                            "response", "prediction", "created_at", 
+                            "parent_mlalgorithm")
+        fields =  ("id", "input_data", "full_response", "response",
+                   "prediction", "feedback", "created_at", 
+                   "parent_mlalgorithm")
+
+class ABTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ABTest
+        read_only_fields = ("id", "ended_at", "created_at", "summary")
+        fields = ("id", "title", "created_by", "created_at", "ended_at",
+                  "summary", "algorithm_A", "algorithm_B")
